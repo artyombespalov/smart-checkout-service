@@ -1,0 +1,18 @@
+{
+  "cartId": "123e4567-e89b-12d3-a456-426614174000",
+  "customerId": "customer-42",
+  "items": [
+    {
+      "productId": "prod-1",
+      "name": "T-Shirt",
+      "unitPrice": 2000,
+      "quantity": 2
+    },
+    {
+      "productId": "prod-2",
+      "name": "Mug",
+      "unitPrice": 1500,
+      "quantity": 1
+    }
+  ]
+}

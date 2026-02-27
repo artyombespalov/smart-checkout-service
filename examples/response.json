@@ -1,0 +1,14 @@
+{
+  "orderId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "cartId": "123e4567-e89b-12d3-a456-426614174000",
+  "customerId": "customer-42",
+  "items": [
+    { "productId": "prod-1", "name": "T-Shirt", "unitPrice": 2000, "quantity": 2, "lineTotal": 4000 },
+    { "productId": "prod-2", "name": "Mug", "unitPrice": 1500, "quantity": 1, "lineTotal": 1500 }
+  ],
+  "subtotal": 5500,
+  "tax": 440,
+  "total": 5940,
+  "status": "CONFIRMED",
+  "createdAt": "2026-02-27T10:30:00.000Z"
+}

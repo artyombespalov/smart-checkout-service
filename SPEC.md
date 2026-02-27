@@ -33,6 +33,19 @@ Client → POST /checkout
 
 ---
 
+## Retry Behavior
+
+The API is designed to be **safe to retry at any time**:
+
+- If a request fails before the order is created → retrying will create the order normally
+- If a request fails after the order is created → retrying will return the existing order (idempotency kicks in)
+- The client always gets the same response for the same `cartId` regardless of how many times it retries
+- No side effects (duplicate orders, double charges) will occur from retries
+
+This means the client can safely retry on network timeouts or 5xx errors without any special logic.
+
+---
+
 ## API
 
 ### Endpoint
@@ -109,19 +122,6 @@ Same response as above. No new order is created.
   "message": "An unexpected error occurred"
 }
 ```
-
----
-
-## Retry Behavior
-
-The API is designed to be **safe to retry at any time**:
-
-- If a request fails before the order is created → retrying will create the order normally
-- If a request fails after the order is created → retrying will return the existing order (idempotency kicks in)
-- The client always gets the same response for the same `cartId` regardless of how many times it retries
-- No side effects (duplicate orders, double charges) will occur from retries
-
-This means the client can safely retry on network timeouts or 5xx errors without any special logic.
 
 ---
 
@@ -258,3 +258,15 @@ All logs are structured JSON:
   "durationMs": 42
 }
 ```
+
+---
+
+## Known Trade-offs
+
+### Double DynamoDB read in happy path
+
+`checkout.ts` calls `getOrderByCartId` first (step 3), then `createOrder` (step 5). This means two DynamoDB round-trips on every new order. An optimized implementation would skip the initial `Get` and go straight to `PutCommand` with `attribute_not_exists` — only falling back to a `Get` on conflict. The current approach was chosen for clarity and direct spec alignment. `repository.ts` already handles the race condition correctly if the pre-check is removed.
+
+### AC8 test coupled to log action name
+
+The test for AC8 (payment after order creation) detects call order by intercepting `console.log` and parsing the `action: 'payment.capture'` field. If that log action string is renamed, the test will silently pass without verifying the correct behavior. A more robust approach would be to inject the payment function as a dependency.

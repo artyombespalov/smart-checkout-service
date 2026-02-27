@@ -9,7 +9,10 @@ import type { Order } from './types';
 
 const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-const TABLE_NAME = process.env['ORDERS_TABLE'] ?? '';
+const TABLE_NAME = process.env['ORDERS_TABLE'];
+if (!TABLE_NAME) {
+  throw new Error('Missing required environment variable: ORDERS_TABLE');
+}
 
 export async function getOrderByCartId(cartId: string): Promise<Order | null> {
   const result = await client.send(
